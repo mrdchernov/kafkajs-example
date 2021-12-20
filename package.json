@@ -1,0 +1,23 @@
+{
+  "name": "KafkaNestJS",
+  "version": "1.0.0",
+  "description": "Test Project to set up kafka",
+  "main": "index.js",
+  "author": "Dima <dmitry.chernov19960417@gmail.com>",
+  "license": "MIT",
+  "useWorkspaces": true,
+  "private": true,
+  "workspaces": [
+    "packages/database",
+    "packages/kafka",
+    "microservices/api-gateway",
+    "microservices/user-service",
+    "microservices/order-service"
+  ],
+  "scripts": {
+    "lerna:bootstrap": "npx lerna bootstrap && yarn workspaces run postpack"
+  },
+  "dependencies": {
+    "lerna": "^4.0.0"
+  }
+}

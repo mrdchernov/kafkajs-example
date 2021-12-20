@@ -1,0 +1,14 @@
+{
+  "name": "@testing/database",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Dima <dmitry.chernov19960417@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "postpack": "echo \"No need\""
+  },
+  "dependencies": {
+    "pg": "^8.7.1",
+    "typeorm": "^0.2.41"
+  }
+}
