@@ -14,7 +14,6 @@ export class KafkaService {
   private producer: Producer;
   private readonly timeout: number;
   private eventListener: EventEmitter;
-  private readonly useSlug: boolean;
   private readonly postfix: string;
 
   private topics: Map<string, kafkaSubscription> = new Map();
@@ -24,7 +23,6 @@ export class KafkaService {
     this.timeout = options.timeout;
     this.postfix = uuidv4().toString();
     console.log('postfix', this.postfix);
-    this.useSlug = options.isApi;
     this.kafka = new Kafka({
       ...client,
     });
@@ -52,6 +50,7 @@ export class KafkaService {
       await this.admin.createTopics({
         topics: [{ topic: subTopic, numPartitions: DEFAULT_PARTITION_AMOUNT }],
       });
+      console.log('subscribing to -> ', subTopic);
       await this.consumer.subscribe({
         topic: subTopic,
         fromBeginning: false,
@@ -87,12 +86,19 @@ export class KafkaService {
       const id = resId || uuidv4().toString();
       if (!reply) {
         this.eventListener.addListener(id, (data) => {
-          console.log('resolved item', data);
+          console.log('resolved item', Buffer.from(data).toString());
 
-          resolve(new Buffer(data).toString());
+          resolve(Buffer.from(data).toString());
         });
       }
-
+      console.log('\nsending message', {
+        value: JSON.stringify(value),
+        headers: {
+          ...(reply && { reply: 'true' }),
+          reqId: id,
+          ...(sub?.replyTopic && { replyTopic: sub.replyTopic }),
+        },
+      });
       await this.producer.send({
         topic: topic,
         messages: [
@@ -126,17 +132,17 @@ export class KafkaService {
     });
   }
 
-  private async processMessage({ topic, partition, message }) {
+  private processMessage({ topic, partition, message }) {
     // --logging
     const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`;
     console.log(
       `- ${prefix} ${message.key}#${JSON.stringify(message.headers)}`,
     );
     // --end logging
-    const id = new Buffer(message.headers.reqId).toString();
+    const id = Buffer.from(message.headers.reqId).toString();
     let replyTopic = message.headers.replyTopic;
     if (replyTopic) {
-      replyTopic = new Buffer(message.headers.replyTopic).toString();
+      replyTopic = Buffer.from(message.headers.replyTopic).toString();
     }
     console.log('reply topic === > ', replyTopic, id);
     const sub = this.topics.get(topic);
@@ -144,19 +150,21 @@ export class KafkaService {
       this.eventListener.emit(id, message.value);
       return;
     }
-    let res, err;
-    try {
-      res = await sub.handler(message);
-    } catch (e) {
-      err = e.message;
-    }
-    await this.sendMessage(
-      replyTopic,
-      { data: res, error: err },
-      {
-        reply: true,
-        id: id,
-      },
-    );
+    setTimeout(async () => {
+      let err, res;
+      try {
+        res = await sub.handler(message);
+      } catch (err) {
+        err = err.message;
+      }
+      await this.sendMessage(
+        replyTopic,
+        { data: res, error: err },
+        {
+          reply: true,
+          id: id,
+        },
+      );
+    }, 0);
   }
 }

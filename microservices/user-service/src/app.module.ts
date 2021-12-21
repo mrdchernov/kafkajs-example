@@ -3,6 +3,7 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { KafkaModule } from '@testing/kafka';
 import config from '../config';
+import { OtherService } from './other.service';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import config from '../config';
       useFactory: (configService: ConfigService) => configService.get('kafka'),
     }),
   ],
-  providers: [AppService],
+  providers: [AppService, OtherService],
+  exports: [OtherService],
 })
 export class AppModule {}

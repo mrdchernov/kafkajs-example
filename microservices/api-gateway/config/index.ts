@@ -11,7 +11,6 @@ export default () => ({
     consumer: {
       groupId: process.env.KAFKA_CONSUMER_GROUP_ID,
     },
-    isApi: true,
-    timeout: 5000,
+    timeout: 15000,
   },
 });

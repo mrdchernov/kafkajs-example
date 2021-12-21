@@ -45,8 +45,6 @@ export function Subscribe(topic: string) {
       target,
     );
     console.log(target, target.kafkaService, descriptor.value);
-    // target.kafkaService &&
-    //   target.kafkaService.subscribeToResponseOf(topic, descriptor.value);
 
     return {
       ...descriptor,
