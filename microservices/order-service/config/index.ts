@@ -7,5 +7,10 @@ export default () => ({
     consumer: {
       groupId: process.env.KAFKA_CONSUMER_GROUP_ID,
     },
+    isApi: false,
+    timeout: 5000,
+  },
+  service: {
+    port: process.env.SERVICE_PORT,
   },
 });

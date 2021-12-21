@@ -25,6 +25,7 @@
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^1.1.5",
     "@nestjs/core": "^8.0.0",
+    "@nestjs/microservices": "^8.2.4",
     "@nestjs/platform-express": "^8.0.0",
     "@testing/kafka": "0.0.1",
     "reflect-metadata": "^0.1.13",

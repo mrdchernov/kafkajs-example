@@ -11,3 +11,5 @@ export type kafkaSubscription = {
   handler: (unknown) => unknown;
   replyTopic?: string;
 };
+
+export const SUBSCRIPTIONS_METADATA = Symbol('subscriptions');
